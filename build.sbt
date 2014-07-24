@@ -2,31 +2,29 @@ organization := "com.nparry"
 
 name := "orderly"
 
-version := "1.0.5-SNAPSHOT"
+version := "1.0.6-SNAPSHOT"
 
 description := "An implementation of Orderly JSON (http://orderly-json.org/) for use on the JVM"
 
 licenses += "BSD license" -> url("http://www.opensource.org/licenses/bsd-license.php" )
 
-libraryDependencies ++= Seq(
-  "net.liftweb" %% "lift-json" % "2.5",
-  "org.specs2" %% "specs2" % "1.12.3" % "test"
-)
+libraryDependencies ++= (scalaBinaryVersion.value match {
+  case "2.10" => Seq(
+    "net.liftweb" %% "lift-json" % "2.5",
+    "org.specs2" %% "specs2" % "2.3.13" % "test")
+  case "2.11" => Seq(
+    "net.liftweb" %% "lift-json" % "2.6-M4",
+    "org.specs2" %% "specs2" % "2.3.13" % "test")
+})
 
-crossScalaVersions := Seq("2.9.2", "2.10.2")
+crossScalaVersions := Seq("2.10.4", "2.11.2")
 
 publishMavenStyle := true
 
 publishTo <<= (version) { version: String =>
-  val repoInfo = if (version.trim.endsWith("SNAPSHOT"))
-      ( "nparry snapshots" -> "/home/nparry/repository.nparry.com/snapshots" )
-    else
-      ( "nparry releases" -> "/home/nparry/repository.nparry.com/releases" )
-  val user = System.getProperty("user.name")
-  val keyFile = (Path.userHome / ".ssh" / "id_rsa").asFile
-  Some(Resolver.ssh(
-    repoInfo._1,
-    "repository.nparry.com",
-    repoInfo._2) as(user, keyFile) withPermissions("0644"))
+  val repo = if (version endsWith "SNAPSHOT") "snapshot" else "release"
+    if (version endsWith "SNAPSHOT") "snapshot" else "release"
+    Some("Rhinofly Internal " + repo.capitalize + " Repository" at "http://maven-repository.rhinofly.net:8081/artifactory/libs-" + repo + "-local")
 }
+
 
